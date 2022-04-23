@@ -1,5 +1,3 @@
-import random
-import string
 from fastapi import HTTPException
 from app import constants
 from app.models.role import Role
@@ -16,12 +14,17 @@ def check_admin(uid: str):
 
 def create_user(uid: str, user: CreateUser):
     check_admin(uid)
-    created_user = auth.create_user(email=user.email, display_name=user.name, password=user.password)
-    user = User(**user.dict())
-    db.reference(f'users/{created_user.uid}').set(user.dict())
-    get_user = user.dict()
-    get_user['id'] = created_user.uid
-    return GetUser(**get_user)
+
+    try:
+        created_user = auth.create_user(email=user.email, display_name=user.name, password=user.password)
+        user = User(**user.dict())
+        db.reference(f'users/{created_user.uid}').set(user.dict())
+        get_user = user.dict()
+        get_user['id'] = created_user.uid
+        return GetUser(**get_user)
+    except auth.EmailAlreadyExistsError:
+        raise HTTPException(409, constants['USER_EXISTS'])
+
 
 def get_users(uid: str):
     check_admin(uid)
@@ -42,3 +45,8 @@ def get_user_with_id(uid: str, user_id: str):
     user = db.reference(f'users/{user_id}').get()
     user['id'] = user_id
     return GetUser(**user)
+
+def delete_user(uid: str, user_id: str):
+    check_admin(uid)
+    auth.delete_user(user_id)
+    db.reference(f'users/{user_id}').delete()

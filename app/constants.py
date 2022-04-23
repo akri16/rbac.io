@@ -4,7 +4,8 @@ constants = {
     "INVALID_AUTH_CODE": "Invalid authorization code",
     "INVALID_AUTH_SCHEME": "Invalid authentication scheme",
     "USER_NOT_CREATED": "User not created yet",
-    "ADMIN_FEAT": "This is an admin feature. Cannot be accesed by users"
+    "ADMIN_FEAT": "This is an admin feature. Cannot be accesed by users",
+    "USER_EXISTS": "This User aleady exists"
 }
 
 login_endpoint = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDRSgX37x_bmnLHVlmBweT4r7UVDHV-8cQ"

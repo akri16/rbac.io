@@ -5,7 +5,7 @@ from fastapi.exceptions import HTTPException
 import time
 from firebase_admin import db
 from fastapi.middleware.cors import CORSMiddleware
-from app.firebase.admins import create_user, get_user_with_id, get_users, update_role
+from app.firebase.admins import create_user, delete_user, get_user_with_id, get_users, update_role
 from app.firebase.auth import FirebaseBearer
 from app.firebase.common import login_client
 
@@ -52,3 +52,8 @@ async def get_all_users(id: str = Depends(FirebaseBearer())) -> List[GetUser]:
 @app.get("/user/{id}", response_model=GetUser, tags=['admin'])
 async def get_user(user_id: str, id: str = Depends(FirebaseBearer())) -> GetUser:
     return get_user_with_id(id, user_id)
+
+@app.delete("/user/{id}", tags=['admin'])
+async def delete_user_account(user_id: str, id: str = Depends(FirebaseBearer())) -> str:
+    delete_user(id, user_id)
+    return "Success"
