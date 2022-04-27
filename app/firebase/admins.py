@@ -48,5 +48,9 @@ def get_user_with_id(uid: str, user_id: str):
 
 def delete_user(uid: str, user_id: str):
     check_admin(uid)
+
+    if uid == user_id:
+        raise HTTPException(403, constants["SELF_DELETE"])
+
     auth.delete_user(user_id)
     db.reference(f'users/{user_id}').delete()
