@@ -1,5 +1,5 @@
 from ast import List
-from fastapi import Depends, FastAPI
+from fastapi import BackgroundTasks, Depends, FastAPI, Request, Response
 from fastapi.params import Body
 from fastapi.exceptions import HTTPException
 import time
@@ -7,7 +7,9 @@ from firebase_admin import db
 from fastapi.middleware.cors import CORSMiddleware
 from app.firebase.admins import create_user, delete_user, get_user_with_id, get_users, update_role
 from app.firebase.auth import FirebaseBearer
-from app.firebase.common import login_client
+from app.firebase.common import login_client, log
+from app.firebase.dev import get_all_logs
+from app.models.log import Log
 
 from app.models.login import Login
 from app.models.role import Role
@@ -27,6 +29,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def logging_middleware(request: Request, call_next):
+    msg = f"{request.client} {request.method} {request.url} "
+    response: Response = await call_next(request)
+    msg += f"{response.status_code}"
+    log(msg)
+    return response
 
 @app.get("/")
 async def root() -> dict:
@@ -57,3 +67,7 @@ async def get_user(user_id: str, id: str = Depends(FirebaseBearer())) -> GetUser
 async def delete_user_account(user_id: str, id: str = Depends(FirebaseBearer())) -> str:
     delete_user(id, user_id)
     return "Success"
+
+@app.get("/logs", tags=['dev'], response_model = List[Log])
+async def get_logs(id: str = Depends(FirebaseBearer())) -> List[Log]:
+    return get_all_logs(id)

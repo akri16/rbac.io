@@ -12,6 +12,8 @@ def init():
         'databaseURL': os.getenv('DATABASE_URL')
     })
 
+
+
 def verify_id_token(token: str):
     try:
         decoded_token = auth.verify_id_token(token)
@@ -35,3 +37,10 @@ async def login_client(email: str, password: str):
     async with httpx.AsyncClient() as client:
         r = await client.post(login_endpoint, json=data)
         return r.json()
+
+def log(msg: str):
+    curr = int(time.time())
+    db.reference(f'logs/{curr}').set(msg)
+
+
+    

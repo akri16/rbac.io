@@ -5,6 +5,7 @@ constants = {
     "INVALID_AUTH_SCHEME": "Invalid authentication scheme",
     "USER_NOT_CREATED": "User not created yet",
     "ADMIN_FEAT": "This is an admin feature. Cannot be accesed by users",
+    "DEV_FEAT": "This is an developer feature. Cannot be accesed by others",
     "USER_EXISTS": "This User aleady exists"
 }
 
