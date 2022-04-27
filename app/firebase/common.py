@@ -42,5 +42,8 @@ def log(msg: str):
     curr = int(time.time())
     db.reference(f'logs/{curr}').set(msg)
 
-
+def check_valid_ip(ip: str):
+    keys = db.reference('blocked_ips').order_by_value().equal_to(ip).get().keys()
+    if len(keys) != 0:
+        raise HTTPException(403, constants['IP_BLOCKED'])
     

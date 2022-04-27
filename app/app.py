@@ -1,4 +1,5 @@
 from ast import List
+from ipaddress import ip_address
 from fastapi import BackgroundTasks, Depends, FastAPI, Request, Response
 from fastapi.params import Body
 from fastapi.exceptions import HTTPException
@@ -7,14 +8,14 @@ from firebase_admin import db
 from fastapi.middleware.cors import CORSMiddleware
 from app.firebase.admins import create_user, delete_user, get_user_with_id, get_users, update_role
 from app.firebase.auth import FirebaseBearer
-from app.firebase.common import login_client, log
-from app.firebase.dev import get_all_logs
+from app.firebase.common import login_client, log, check_valid_ip
+from app.firebase.dev import block_user_ip, get_all_blocked_user_ips, get_all_logs, unblock_user_ip
 from app.models.log import Log
 
 from app.models.login import Login
 from app.models.role import Role
 from app.models.user import CreateUser, GetUser, User
-
+from starlette.responses import JSONResponse
 from typing import List
 
 
@@ -37,6 +38,16 @@ async def logging_middleware(request: Request, call_next):
     msg += f"{response.status_code}"
     log(msg)
     return response
+
+@app.middleware("http")
+async def ip_validate_middleware(request: Request, call_next):
+    try:
+        check_valid_ip(request.client.host)
+        response: Response = await call_next(request)
+        return response
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content=e.detail)
+    
 
 @app.get("/")
 async def root() -> dict:
@@ -71,3 +82,17 @@ async def delete_user_account(user_id: str, id: str = Depends(FirebaseBearer()))
 @app.get("/logs", tags=['dev'], response_model = List[Log])
 async def get_logs(id: str = Depends(FirebaseBearer())) -> List[Log]:
     return get_all_logs(id)
+
+@app.put("/blocked_ip", tags=['dev'])
+async def block_ip(ip: str, id: str = Depends(FirebaseBearer())) -> List[Log]:
+    block_user_ip(id, ip_address(ip))
+    return "Success"
+
+@app.delete("/blocked_ip/{ip}", tags=['dev'])
+async def unblock_ip(ip: str, id: str = Depends(FirebaseBearer())) -> List[Log]:
+    unblock_user_ip(id, ip_address(ip))
+    return "Success"
+
+@app.get("/blocked_ips", tags=['dev'])
+async def get_all_blocked_ips(id: str = Depends(FirebaseBearer())) -> List[str]:
+    return get_all_blocked_user_ips(id)

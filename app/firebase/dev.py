@@ -1,4 +1,6 @@
 
+from ipaddress import IPv4Address
+from typing import List
 from fastapi import HTTPException
 from app import constants
 from app.models.role import Role
@@ -25,6 +27,26 @@ def get_all_logs(id: str):
         l.append(Log(**log))
 
     return l
+
+def block_user_ip(id: str, ip: IPv4Address):
+    check_dev(id)
+    keys = db.reference('blocked_ips').order_by_value().equal_to(ip.exploded).get().keys()
+    if len(keys) == 0:
+        db.reference('blocked_ips').push(ip.exploded)
+
+
+def unblock_user_ip(id: str, ip: IPv4Address):
+    check_dev(id)
+    keys = list(db.reference('blocked_ips').order_by_value().equal_to(ip.exploded).get().keys())
+    if len(keys) == 0:
+        raise HTTPException(403, constants['IP_NOT_BLOCK'])
+        
+    db.reference(f'blocked_ips/{keys[0]}').delete()
+
+def get_all_blocked_user_ips(id: str) -> List[str]: 
+    check_dev(id)
+    ips = db.reference('blocked_ips').get()
+    return list(ips.values())
 
                      
 
