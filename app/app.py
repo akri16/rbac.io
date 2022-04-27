@@ -49,11 +49,11 @@ async def update_user_role(role: Role, user_uid: str, id: str = Depends(Firebase
 async def get_all_users(id: str = Depends(FirebaseBearer())) -> List[GetUser]:
     return get_users(id)
 
-@app.get("/user/{id}", response_model=GetUser, tags=['admin'])
+@app.get("/user/{user_id}", response_model=GetUser, tags=['admin'])
 async def get_user(user_id: str, id: str = Depends(FirebaseBearer())) -> GetUser:
     return get_user_with_id(id, user_id)
 
-@app.delete("/user/{id}", tags=['admin'])
+@app.delete("/user/{user_id}", tags=['admin'])
 async def delete_user_account(user_id: str, id: str = Depends(FirebaseBearer())) -> str:
     delete_user(id, user_id)
     return "Success"
