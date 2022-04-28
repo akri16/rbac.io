@@ -3,6 +3,9 @@ from fastapi.exceptions import HTTPException
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db, auth
+
+from app.firebase.admins import get_user_with_id
+from app.models.user import GetUserWithToken
 from ..constants import constants, login_endpoint
 
 
@@ -31,12 +34,19 @@ def getUserDetails(id: str):
     return user
 
 
-async def login_client(email: str, password: str):
+async def login_client(email: str, password: str) -> GetUserWithToken:
     data = {'email': email, 'password': password, 'returnSecureToken': True}
 
     async with httpx.AsyncClient() as client:
         r = await client.post(login_endpoint, json=data)
-        return r.json()
+        ld = r.json()
+        token = ld['idToken']
+        id = ld['localId']
+
+        deet = getUserDetails(id)
+        deet['id'] = id
+        deet['token'] = token
+        return GetUserWithToken(**deet)
 
 def log(msg: str):
     curr = int(time.time())

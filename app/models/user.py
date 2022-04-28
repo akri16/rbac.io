@@ -12,3 +12,6 @@ class CreateUser(User):
 
 class GetUser(User):
     id: str
+
+class GetUserWithToken(GetUser):
+    token: str

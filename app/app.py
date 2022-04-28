@@ -14,7 +14,7 @@ from app.models.log import Log
 
 from app.models.login import Login
 from app.models.role import Role
-from app.models.user import CreateUser, GetUser, User
+from app.models.user import CreateUser, GetUser, GetUserWithToken, User
 from starlette.responses import JSONResponse
 from typing import List
 
@@ -54,7 +54,7 @@ async def root() -> dict:
     return {"message": "Hello World"}
 
 @app.post("/login")
-async def login(login: Login) -> dict:
+async def login(login: Login) -> GetUserWithToken:
     return await login_client(login.email, login.password)
 
 @app.post("/create_user", response_model=GetUser, tags=['admin']) 

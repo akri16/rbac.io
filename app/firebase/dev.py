@@ -17,7 +17,7 @@ def check_dev(uid: str):
 
 def get_all_logs(id: str):
     check_dev(id)
-    logs = db.reference('logs').order_by_key().get()
+    logs = db.reference('logs').order_by_key().get().reverse()
 
     l = []
     for k, v in logs.items():
@@ -48,6 +48,6 @@ def get_all_blocked_user_ips(id: str) -> List[str]:
     ips = db.reference('blocked_ips').get()
     return list(ips.values())
 
-                     
+ 
 
 
