@@ -17,7 +17,7 @@ def check_dev(uid: str):
 
 def get_all_logs(id: str):
     check_dev(id)
-    logs = db.reference('logs').order_by_key().get().reverse()
+    logs = db.reference('logs').order_by_key().get()
 
     l = []
     for k, v in logs.items():
@@ -26,6 +26,7 @@ def get_all_logs(id: str):
         log['timestamp'] = k
         l.append(Log(**log))
 
+    l.reverse()
     return l
 
 def block_user_ip(id: str, ip: IPv4Address):
