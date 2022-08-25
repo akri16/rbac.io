@@ -9,7 +9,8 @@ constants = {
     "USER_EXISTS": "This User aleady exists",
     "SELF_DELETE": "You can't delete yourself lol",
     "IP_NOT_BLOCK": "IPAddress not in Blocklist",
-    "IP_BLOCKED": "Your IP has been blocked by the System Admin"
+    "IP_BLOCKED": "Your IP has been blocked by the System Admin",
+    "INVALID_CREDS": "The entered credentials are invalid"
 }
 
 login_endpoint = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDRSgX37x_bmnLHVlmBweT4r7UVDHV-8cQ"

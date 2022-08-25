@@ -39,6 +39,10 @@ async def login_client(email: str, password: str) -> GetUserWithToken:
 
     async with httpx.AsyncClient() as client:
         r = await client.post(login_endpoint, json=data)
+
+        if r.status_code != 200 :
+            raise HTTPException(status_code=401, detail=constants['INVALID_CREDS'])
+
         ld = r.json()
         token = ld['idToken']
         id = ld['localId']
@@ -47,6 +51,7 @@ async def login_client(email: str, password: str) -> GetUserWithToken:
         deet['id'] = id
         deet['token'] = token
         return GetUserWithToken(**deet)
+
 
 def log(msg: str):
     curr = int(time.time())
